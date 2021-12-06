@@ -11,7 +11,8 @@ The code has been tested on CUDA 11.0+.
 3. If you want to train on wow instead, skip step 2. Create a folder `./wow` and change the path variable in `./path` file to `./wow`.
 4. Run `bash setup.sh`.
 
-## Training
+## Data Preparation and Training
+The default parameters were used to run on 2 NVIDIA Quadro Q6000 GPUs. Each training process took about 18 hours for 20 epochs (default). 
 1. Simply run `bash run.sh dialdoc` or `bash run.sh wow` depending on which dataset you want to run.
 
 ## Inference and Evaluation (To-be-updated)
