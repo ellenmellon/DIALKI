@@ -5,6 +5,7 @@ This repo provides the training and inference code for the DIALKI model in our E
 
 
 ## Setup
+The code has been tested on CUDA 11.0+.
 1. Run `conda env create -f environment.yml` and `conda activate dialki`
 2. To train on doc2dial dataset, first create a folder `./dialdoc` and put original data files from [here](https://github.com/doc2dial/sharedtask-dialdoc2021/tree/master/data/doc2dial/v1.0.1) into a subfolder `./dialdoc/raw_data`.
 3. If you want to train on wow instead, skip step 2. Create a folder `./wow` and change the path variable in `./path` file to `./wow`.
