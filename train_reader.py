@@ -887,6 +887,7 @@ def main():
     options.add_training_params(parser)
     options.add_data_params(parser)
     args = parser.parse_args()
+    args.local_rank = int(os.environ["LOCAL_RANK"])
     if args.passage_attend_history:
         assert args.special_attention, \
             'passage_attend_history is a kind of special attention.'

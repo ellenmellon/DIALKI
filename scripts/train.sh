@@ -1,11 +1,21 @@
 . path
 
-export WORLD_SIZE=2
-
-output_dir=${parent_dir}/exp
-mkdir -p $output_dir
+export WORLD_SIZE=4
+export MASTER_ADDR="127.0.0.1"
+export MASTER_PORT="10123"
+export OMP_NUM_THREADS=1
 
 data_name=$1
+
+if [ $# -ne 1 ]; then
+    echo $0 [data_name]
+    exit 1
+fi
+
+base_dir=${parent_dir}/$data_name
+output_dir=${base_dir}/exp
+mkdir -p $output_dir
+
 if [ $data_name == "dialdoc" ]; then
     max_seq_len=512
     passages_per_question=8
@@ -18,7 +28,11 @@ else
     hist_loss_weight=0.5
 fi
 
-python -m torch.distributed.launch --nproc_per_node $WORLD_SIZE train_reader.py \
+torchrun \
+    --nproc_per_node $WORLD_SIZE \
+    --standalone \
+    --nnodes=1 \
+    train_reader.py \
     --pretrained_model_cfg ${parent_dir}/pretrained_models/bert-base-uncased \
     --seed 42 \
     --learning_rate 3e-5 \
@@ -33,8 +47,8 @@ python -m torch.distributed.launch --nproc_per_node $WORLD_SIZE train_reader.py 
     --dev_batch_size 4 \
     --max_answer_length ${max_answer_length} \
     --passages_per_question_predict 20 \
-    --train_file ${parent_dir}/cache/cls_bert/train \
-    --dev_file ${parent_dir}/cache/cls_bert/dev \
+    --train_file ${base_dir}/cache/cls_bert/train \
+    --dev_file ${base_dir}/cache/cls_bert/dev \
     --output_dir $output_dir \
     --gradient_accumulation_steps 1 \
     --ignore_token_type \
@@ -46,4 +60,3 @@ python -m torch.distributed.launch --nproc_per_node $WORLD_SIZE train_reader.py 
     --adv_loss_type js \
     --adv_loss_weight 5 \
     --use_z_attn
-

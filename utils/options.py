@@ -405,26 +405,14 @@ def set_seed(args):
         torch.cuda.manual_seed_all(seed)
 
 
-def next_free_port(port=10123, max_port=65535):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    while port <= max_port:
-        try:
-            sock.bind(('', port))
-            sock.close()
-            return port
-        except OSError:
-            port += 1
-    raise IOError('no free ports')
-
-
 def setup_args_gpu(args):
     """
     Setup arguments CUDA, GPU & distributed training.
     """
 
-    word_size = os.environ.get('WORLD_SIZE')
-    word_size = int(word_size) if word_size else 1
-    args.distributed_world_size = word_size
+    world_size = os.environ.get('WORLD_SIZE')
+    world_size = int(world_size) if world_size else 1
+    args.distributed_world_size = world_size
     local_rank = args.local_rank
   
     if local_rank == -1:
@@ -439,18 +427,16 @@ def setup_args_gpu(args):
         # Distributed mode.
         torch.cuda.set_device(args.local_rank)
         device = torch.device('cuda', args.local_rank)
-        master_port = next_free_port()
-        dist_init_method = f'tcp://localhost:{master_port}'
+        # set up the master's ip address so this child process can coordinate
         torch.distributed.init_process_group(
             backend='nccl',
-            init_method=dist_init_method,
             rank=args.local_rank,
-            world_size=word_size)
+            world_size=world_size)
         n_gpu = args.n_gpu = 1
     args.device = device
 
     if dist_utils.is_local_master():
         logger.info(
             f'Initialized host {socket.gethostname()}'
-            f'{local_rank = } {device = } {n_gpu = } {word_size = }'
+            f'{local_rank = } {device = } {n_gpu = } {world_size = }'
             f'16-bits training: {args.fp16}')
