@@ -7,7 +7,7 @@ data_name=$1
 IFS=- read hf_model_type the_rest <<< "$hf_model_name"
 
 pretrained_model_dir=${parent_dir}/pretrained_models/${hf_model_name}
-base_dir=${parent_dir}
+base_dir=${parent_dir}/$data_name
 if [ $data_name == "dialdoc" ]; then
     max_seq_len=512
 else

@@ -248,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--filepath",
         type=str,
-        default='./raw_data/v1.0.1/doc2dial_dial_{}.json',
+        default='./your_parent_dir/dialdoc/raw_data/doc2dial_dial_{}.json',
         help="file of the input dial data",
     )
     parser.add_argument(
