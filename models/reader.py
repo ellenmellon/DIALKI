@@ -669,23 +669,45 @@ def compute_loss(args, logits, batch, others):
 
     # History loss.
     if args.hist_loss_weight > 0:
+        loss_fct2 = nn.CrossEntropyLoss(ignore_index=-1, reduction='none')
         max_num_spans = logits['history_start'].size(2)
         # history_start_logits size = (N*M, max_num_history_questions, Ls)
-        history_start_loss = loss_fct(
+        history_start_loss = loss_fct2(
             logits['history_start'].view(-1, max_num_spans),
             batch['history_answer_starts'].view(-1))
-        history_end_loss = loss_fct(
+        history_end_loss = loss_fct2(
             logits['history_end'].view(-1, max_num_spans),
             batch['history_answer_ends'].view(-1))
-    
+
+        start_mask = batch['history_answer_starts'] != -1
+        end_mask = batch['history_answer_ends'] != -1
+
+        # If the batch has no history spans, it will result in NaN loss.
+        # Thus, we chech if there is at least one span and compute mean of loss.
+        if start_mask.sum() == 0:
+            history_start_loss = history_start_loss.mean()
+        else:
+            history_start_loss = history_start_loss.sum() / start_mask.sum()
+
+        if end_mask.sum() == 0:
+            history_end_loss = history_end_loss.mean()
+        else:
+            history_end_loss = history_end_loss.sum() / end_mask.sum()
+
         # history_relevance_logits size = (N*M, max_num_history_questions, 1)
         # history_relevance size = (N, max_num_history_questions)
         max_num_history_questions = logits['history_relevance'].size(1)
         history_relevance_logits = torch.cat(
             [t.transpose(0, 1)
             for t in logits['history_relevance'].split(M, dim=0)], dim=0)
-        history_passage_loss = loss_fct(history_relevance_logits.view(
+        history_passage_loss = loss_fct2(history_relevance_logits.view(
             N*max_num_history_questions, M), batch['history_relevance'].view(-1))
+
+        passage_mask = batch['history_relevance'] != -1
+        if passage_mask.sum() == 0:
+            history_passage_loss = history_passage_loss.mean()
+        else:
+            history_passage_loss = history_passage_loss.sum() / passage_mask.sum()
     
         history_span_loss = history_start_loss + history_end_loss 
     
