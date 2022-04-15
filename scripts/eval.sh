@@ -6,13 +6,15 @@ export MASTER_PORT="10123"
 export OMP_NUM_THREADS=1
 
 data_name=$1
+checkpoint_path=$3
+prediction_results_path=$4
 
-if [ $# -ne 1 ]; then
-    echo $0 [data_name]
+if [ $# -ne 3 ]; then
+    echo $0 [data_name] [checkpoint path] [prediction_results_path]
     exit 1
 fi
 
-base_dir=${parent_dir}/$data_name
+base_dir=${parent_dir}/dialki/$data_name
 output_dir=${base_dir}/exp
 mkdir -p $output_dir
 
@@ -34,6 +36,8 @@ torchrun \
     --nnodes=1 \
     train_reader.py \
     --pretrained_model_cfg ${parent_dir}/pretrained_models/bert-base-uncased \
+    --checkpoint_file $checkpoint_path \
+    --prediction_results_file $prediction_results_path \
     --seed 42 \
     --learning_rate 3e-5 \
     --eval_step 1000 \
@@ -47,8 +51,7 @@ torchrun \
     --dev_batch_size 4 \
     --max_answer_length ${max_answer_length} \
     --passages_per_question_predict 20 \
-    --train_file ${base_dir}/cache/cls_bert/train \
-    --dev_file ${base_dir}/cache/cls_bert/dev \
+    --dev_file ${base_dir}/cache/cls_bert/train \
     --output_dir $output_dir \
     --gradient_accumulation_steps 1 \
     --ignore_token_type \

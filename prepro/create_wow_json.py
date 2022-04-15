@@ -108,7 +108,7 @@ class WowDatasetReader:
     def _get_parlai_opt(self, options: List[str] = [], print_args=False):
         from parlai.scripts.build_dict import setup_args
         parser = setup_args()
-        opt = parser.parse_args(options, print_args=print_args)
+        opt = parser.parse_args(options)
         return opt
 
     def _get_preprocessed_fname(self, mode):
@@ -272,7 +272,6 @@ class WoWDialog():
             # make data sample
             sample = WoWDataSample(self.dialid, i, chosen_sentence)
             sample.set_question(list(reversed(prev_turns)), list(reversed(prev_type)))
-
 
             title2sentences = defaultdict(list)
             all_k_sents = turn["knowledge_sentences"]
