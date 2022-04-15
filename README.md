@@ -15,7 +15,10 @@ The code has been tested on CUDA 11.0+.
 The default parameters were used to run on 2 NVIDIA Quadro Q6000 GPUs. Each training process took about 18 hours for 20 epochs (default). 
 1. Simply run `bash run.sh dialdoc` or `bash run.sh wow` depending on which dataset you want to run.
 
-## Inference and Evaluation (To-be-updated)
+## Inference and Evaluation
+After you finish training, run `bash run_eval.sh [dataname] [checkpoint_path] [inference_output_path]` to run inference. `dataname` can be either `dialdoc` or `wow`. The checkpoint_path can be either the best model from your training or [our provided model](https://drive.google.com/drive/folders/1iuEtWgb16r3JNaB8NKRQ8VUQjW3pHvvi?usp=sharing) for each dataset. `inference_output_path` is where you want the inference results to be saved. The console will print out the evaluation results during inference. 
+
+Currently, the inference will run for dev set by default. If you want to change to test sets (note that you need to contact dialdoc authors to get their test set), go to `script/eval.sh` and change the `--dev_file` path.
 
 
 ## Cite
