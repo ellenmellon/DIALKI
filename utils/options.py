@@ -387,6 +387,8 @@ def set_encoder_params_from_state(state, args):
         if param in state and state[param]
     ]
     for param, value in override_params:
+        if param == "pretrained_model_cfg":
+            continue
         if hasattr(args, param):
             if dist_utils.is_local_master():
                 logger.warning(
