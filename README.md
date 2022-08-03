@@ -15,6 +15,9 @@ The code has been tested on CUDA 11.0+.
 The default parameters were used to run on 2 NVIDIA Quadro Q6000 GPUs. Each training process took about 18 hours for 20 epochs (default). 
 1. Simply run `bash run.sh dialdoc` or `bash run.sh wow` depending on which dataset you want to run.
 
+#### Some important parameters to change if not enough memory for training:
+Setting `--adv_loss_weight=0.0` in `scripts/train.sh` disables the posterior regularization, which helps save memory during training, but at the cost of model performance. `--passages_per_question` can also be set smaller to save memory. Setting `--decision_function=0` disables the knowledge contextualization component. 
+
 ## Inference and Evaluation
 After you finish training, run `bash run_eval.sh [dataname] [checkpoint_path] [inference_output_path]` to run inference. `dataname` can be either `dialdoc` or `wow`. The checkpoint_path can be either the best model from your training or [our provided model](https://drive.google.com/drive/folders/1iuEtWgb16r3JNaB8NKRQ8VUQjW3pHvvi?usp=sharing) for each dataset. `inference_output_path` is where you want the inference results to be saved. The console will print out the evaluation results during inference. 
 
